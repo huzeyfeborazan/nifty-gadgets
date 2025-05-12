@@ -1,0 +1,167 @@
+{% extends "app/base.html" %}
+
+{% block title %}{{ product.product_title }} - Nifty Gadgets{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <!-- Header -->
+    <div class="bg-white shadow">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <h1 class="text-3xl font-bold text-gray-900">{{ product.product_title }}</h1>
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-gray-900">${{ product.product_price }}</span>
+                    {% if product.product_is_trending %}
+                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        Trending
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Product Image and Stats -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
+            <div class="px-4 py-5 sm:px-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Product Image -->
+                    <div class="aspect-w-16 aspect-h-9">
+                        {% if product.product_image %}
+                        <img src="{{ product.product_image.url }}" alt="{{ product.product_title }}" class="object-cover w-full h-96 rounded-lg">
+                        {% else %}
+                        <div class="bg-gray-200 flex items-center justify-center h-96 rounded-lg">
+                            <i class="fas fa-image text-gray-400 text-6xl"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Product Stats -->
+                    <div class="space-y-6">
+                        <!-- Rating -->
+                        <div class="flex items-center">
+                            <div class="flex items-center">
+                                {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= product.average_rating %}
+                                <i class="fas fa-star text-yellow-400 text-2xl"></i>
+                                {% else %}
+                                <i class="far fa-star text-yellow-400 text-2xl"></i>
+                                {% endif %}
+                                {% endfor %}
+                                <span class="ml-2 text-lg text-gray-500">({{ product.review_count }} reviews)</span>
+                            </div>
+                        </div>
+
+                        <!-- Like and Comment Counts -->
+                        <div class="flex items-center space-x-6">
+                            <div class="flex items-center text-gray-500">
+                                <i class="fas fa-heart text-red-500 text-xl"></i>
+                                <span class="ml-2 text-lg">{{ product.like_count }} likes</span>
+                            </div>
+                            <div class="flex items-center text-gray-500">
+                                <i class="fas fa-comment text-xl"></i>
+                                <span class="ml-2 text-lg">{{ product.comment_count }} comments</span>
+                            </div>
+                        </div>
+
+                        <!-- Purchase Link -->
+                        {% if product.product_link %}
+                        <div>
+                            <a href="{{ product.product_link }}" target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <i class="fas fa-shopping-cart mr-2"></i>
+                                Buy on {{ product.product_link|urlize|cut:"https://"|cut:"http://"|cut:"www."|cut:"/" }}
+                            </a>
+                        </div>
+                        {% endif %}
+
+                        <!-- Interaction Buttons -->
+                        <div class="flex items-center space-x-4">
+                            <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                <i class="fas fa-heart mr-2"></i>
+                                Like
+                            </button>
+                            <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                <i class="fas fa-comment mr-2"></i>
+                                Comment
+                            </button>
+                            <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                <i class="fas fa-flag mr-2"></i>
+                                Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Information -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
+            <div class="px-4 py-5 sm:px-6">
+                <h2 class="text-lg leading-6 font-medium text-gray-900">Product Information</h2>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">Details about the product.</p>
+            </div>
+            <div class="border-t border-gray-200">
+                <dl>
+                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">Description</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ product.product_description }}</dd>
+                    </div>
+                    <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">Category</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ product.product_category }}</dd>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt class="text-sm font-medium text-gray-500">Added on</dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ product.created_at|date:"F d, Y" }}</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            <div class="px-4 py-5 sm:px-6">
+                <h2 class="text-lg leading-6 font-medium text-gray-900">Reviews</h2>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">What people are saying about this product.</p>
+            </div>
+            <div class="border-t border-gray-200">
+                {% if product.review_set.all %}
+                <div class="divide-y divide-gray-200">
+                    {% for review in product.review_set.all %}
+                    <div class="px-4 py-5 sm:px-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <h3 class="text-lg font-medium text-gray-900">{{ review.review_title }}</h3>
+                                <div class="ml-4 flex items-center">
+                                    {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= review.review_rating %}
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    {% else %}
+                                    <i class="far fa-star text-yellow-400"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                By {{ review.user.username }} on {{ review.created_at|date:"F d, Y" }}
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-sm text-gray-900">{{ review.review_content }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="px-4 py-5 sm:px-6">
+                    <p class="text-sm text-gray-500">No reviews yet. Be the first to review this product!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
