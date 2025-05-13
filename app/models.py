@@ -1,21 +1,24 @@
+"""Models for the Nifty Gadgets application."""
+
 from django.db import models
 
 
 class User(models.Model):
+    """Model representing a user in the system."""
     user_id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
     safety_question = models.CharField(max_length=255)
     safety_answer = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
-    user_name = models.TextField()
-    user_lastname = models.TextField()
-    user_date_of_birth = models.DateField()
-    user_age = models.IntegerField()
+    user_name = models.TextField(default='')
+    user_lastname = models.TextField(default='')
+    user_date_of_birth = models.DateField(default='')
+    user_age = models.IntegerField(default=0)
     user_email = models.EmailField(unique=True)
-    user_security_email = models.EmailField()
-    user_phone_number = models.CharField(max_length=20)
-    user_bio = models.TextField()
+    user_security_email = models.EmailField(default='')
+    user_phone_number = models.CharField(max_length=20, default='')
+    user_bio = models.TextField(default='')
     total_entries_by_user = models.IntegerField(default=0)
     total_likes_by_user = models.IntegerField(default=0)
     total_comments_by_user = models.IntegerField(default=0)
@@ -23,21 +26,23 @@ class User(models.Model):
     total_likes_received_by_user = models.IntegerField(default=0)
     total_comments_received_by_user = models.IntegerField(default=0)
     total_interactions_received_by_user = models.IntegerField(default=0)
-    user_score = models.FloatField()
+    user_score = models.FloatField(default=0)
     user_is_trending = models.BooleanField(default=False)
     user_is_featured = models.BooleanField(default=False)
     user_is_affiliate = models.BooleanField(default=False)
 
 
 class ProductCategory(models.Model):
+    """Model representing a product category."""
     product_category_id = models.AutoField(primary_key=True)
     product_category_title = models.CharField(max_length=255, unique=True)
 
 
 class Product(models.Model):
+    """Model representing a product."""
     product_id = models.AutoField(primary_key=True)
     product_title = models.CharField(max_length=255)
-    product_description = models.TextField()
+    product_description = models.TextField(default='')
     product_category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
     product_price = models.DecimalField(max_digits=10, decimal_places=2)
     author_user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -57,16 +62,18 @@ class Product(models.Model):
 
 
 class Review(models.Model):
+    """Model representing a product review."""
     review_id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
-    review_title = models.CharField(max_length=255)
-    review_content = models.TextField()
-    review_score = models.IntegerField()
+    review_title = models.CharField(max_length=255, default='')
+    review_content = models.TextField(default='')
+    review_score = models.IntegerField(default=0)
 
 
 class Upvote(models.Model):
+    """Model representing a product upvote."""
     upvote_id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -74,6 +81,7 @@ class Upvote(models.Model):
 
 
 class Downvote(models.Model):
+    """Model representing a product downvote."""
     downvote_id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -81,13 +89,16 @@ class Downvote(models.Model):
 
 
 class Comment(models.Model):
+    """Model representing a product comment."""
     comment_id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
+    comment_content = models.TextField(default='')
 
 
 class Report(models.Model):
+    """Model representing a product report."""
     report_id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
