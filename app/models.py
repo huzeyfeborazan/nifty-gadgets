@@ -1,5 +1,4 @@
-"""Models for the Nifty Gadgets application."""
-
+''' Models for the Nifty Gadgets application. '''
 from django.db import models
 
 
@@ -43,9 +42,11 @@ class Product(models.Model):
     product_id = models.AutoField(primary_key=True)
     product_title = models.CharField(max_length=255)
     product_description = models.TextField(default='')
-    product_category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE)
+    product_category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE,
+                                         related_name='products')
     product_price = models.DecimalField(max_digits=10, decimal_places=2)
-    author_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    author_user = models.ForeignKey(User, on_delete=models.CASCADE,
+                                    related_name='products')
     created_at = models.DateTimeField(auto_now_add=True)
     product_upvote_count = models.IntegerField(default=0)
     product_downvote_count = models.IntegerField(default=0)
@@ -64,8 +65,10 @@ class Product(models.Model):
 class Review(models.Model):
     """Model representing a product review."""
     review_id = models.AutoField(primary_key=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,
+                                related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='reviews')
     timestamp = models.DateTimeField(auto_now_add=True)
     review_title = models.CharField(max_length=255, default='')
     review_content = models.TextField(default='')
@@ -75,24 +78,30 @@ class Review(models.Model):
 class Upvote(models.Model):
     """Model representing a product upvote."""
     upvote_id = models.AutoField(primary_key=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,
+                                related_name='upvotes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='upvotes')
     timestamp = models.DateTimeField(auto_now_add=True)
 
 
 class Downvote(models.Model):
     """Model representing a product downvote."""
     downvote_id = models.AutoField(primary_key=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,
+                                related_name='downvotes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='downvotes')
     timestamp = models.DateTimeField(auto_now_add=True)
 
 
 class Comment(models.Model):
     """Model representing a product comment."""
     comment_id = models.AutoField(primary_key=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,
+                                related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='comments')
     timestamp = models.DateTimeField(auto_now_add=True)
     comment_content = models.TextField(default='')
 
@@ -100,6 +109,8 @@ class Comment(models.Model):
 class Report(models.Model):
     """Model representing a product report."""
     report_id = models.AutoField(primary_key=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,
+                                related_name='reports')
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='reports')
     timestamp = models.DateTimeField(auto_now_add=True)

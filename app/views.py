@@ -5,7 +5,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg
+from django.db.models import Avg, Count
 from .models import Product, Review, Upvote, Downvote, Comment, Report
 from .forms import ReviewForm
 
@@ -77,18 +77,27 @@ def feed_view(request):
 def product_detail_view(request, product_id):
     """View for displaying product details and handling user interactions."""
 
-    product = get_object_or_404(Product, id=product_id)
-
     # Calculate product statistics
-    product.average_rating = Review.objects.filter(product=product).aggregate(
-        Avg('review_score'))['review_score__avg'] or 0
-    product.review_count = Review.objects.filter(product=product).count()
-    product.upvote_count = Upvote.objects.filter(product=product).count()
-    product.downvote_count = Downvote.objects.filter(product=product).count()
-    product.comment_count = Comment.objects.filter(product=product).count()
-    denominator = (product.upvote_count + product.downvote_count) * product.review_count
+    product = get_object_or_404(
+        Product.objects.annotate(
+            annotated_average_rating=Avg('review__review_score'),
+            annotated_review_count=Count('review'),
+            annotated_upvote_count=Count('upvote'),
+            annotated_downvote_count=Count('downvote'),
+            annotated_comment_count=Count('comment')
+        ),
+        id=product_id
+    )
+
+    # Handle possible None value from Avg:
+    product.annotated_average_rating = product.annotated_average_rating or 0
+
+    # Calculate product score:
+    denominator = (product.annotated_upvote_count +
+                   product.annotated_downvote_count) * product.annotated_review_count
     product.score = (
-        (product.upvote_count - product.downvote_count) * product.average_rating /
+        (product.annotated_upvote_count - product.annotated_downvote_count)
+          * product.annotated_average_rating /
         denominator if denominator > 0 else 0
     )
 
@@ -153,14 +162,14 @@ def product_detail_view(request, product_id):
 
 
     # Check if current user has interacted with the product
-    user_has_upvoted = request.user.is_authenticated and Upvote.objects.filter(
-        product=product, user=request.user).exists()
-    user_has_downvoted = request.user.is_authenticated and Downvote.objects.filter(
-        product=product, user=request.user).exists()
-    user_has_commented = request.user.is_authenticated and Comment.objects.filter(
-        product=product, user=request.user).exists()
-    user_has_reviewed = request.user.is_authenticated and Review.objects.filter(
-        product=product, user=request.user).exists()
+    if request.user.is_authenticated:
+        user_has_upvoted = Upvote.objects.filter(product=product, user=request.user).exists()
+        user_has_downvoted = Downvote.objects.filter(product=product, user=request.user).exists()
+        user_has_commented = Comment.objects.filter(product=product, user=request.user).exists()
+        user_has_reviewed = Review.objects.filter(product=product, user=request.user).exists()
+    else:
+        user_has_upvoted = user_has_downvoted = user_has_commented = user_has_reviewed = False
+
 
     context = {
         'product': product,
