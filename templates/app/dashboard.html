@@ -17,35 +17,12 @@
         <div class="bg-white overflow-hidden shadow rounded-lg mb-6">
             <div class="px-4 py-5 sm:p-6">
                 <h2 class="text-2xl font-semibold text-gray-900">Welcome, {{ user.username }}!</h2>
-                <p class="mt-1 text-sm text-gray-500">Here's what's happening with your account today.</p>
+                <p class="mt-1 text-sm text-gray-500">Here's your activity overview.</p>
             </div>
         </div>
 
         <!-- Stats Grid -->
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <!-- Total Products -->
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-box text-indigo-600 text-2xl"></i>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">
-                                    Total Products
-                                </dt>
-                                <dd class="flex items-baseline">
-                                    <div class="text-2xl font-semibold text-gray-900">
-                                        0
-                                    </div>
-                                </dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <!-- Reviews -->
             <div class="bg-white overflow-hidden shadow rounded-lg">
                 <div class="p-5">
@@ -56,11 +33,57 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">
-                                    Your Reviews
+                                    Reviews Written
                                 </dt>
                                 <dd class="flex items-baseline">
                                     <div class="text-2xl font-semibold text-gray-900">
-                                        0
+                                        {{ total_reviews }}
+                                    </div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upvotes -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-thumbs-up text-green-400 text-2xl"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">
+                                    Upvotes Given
+                                </dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900">
+                                        {{ total_upvotes }}
+                                    </div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Downvotes -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-thumbs-down text-red-400 text-2xl"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">
+                                    Downvotes Given
+                                </dt>
+                                <dd class="flex items-baseline">
+                                    <div class="text-2xl font-semibold text-gray-900">
+                                        {{ total_downvotes }}
                                     </div>
                                 </dd>
                             </dl>
@@ -79,11 +102,11 @@
                         <div class="ml-5 w-0 flex-1">
                             <dl>
                                 <dt class="text-sm font-medium text-gray-500 truncate">
-                                    Your Comments
+                                    Comments Made
                                 </dt>
                                 <dd class="flex items-baseline">
                                     <div class="text-2xl font-semibold text-gray-900">
-                                        0
+                                        {{ total_comments }}
                                     </div>
                                 </dd>
                             </dl>
@@ -93,15 +116,53 @@
             </div>
         </div>
 
-        <!-- Recent Activity -->
+        <!-- Your Reviews Section -->
         <div class="mt-6 bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:px-6">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">Recent Activity</h3>
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Your Reviews</h3>
             </div>
             <div class="border-t border-gray-200">
+                {% if user_reviews %}
+                <ul class="divide-y divide-gray-200">
+                    {% for review in user_reviews %}
+                    <li class="px-4 py-5 sm:px-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-lg font-medium text-gray-900 truncate">
+                                        <a href="{% url 'app:product_detail' review.product.id %}" class="hover:text-indigo-600">
+                                            {{ review.product.product_title }}
+                                        </a>
+                                    </h4>
+                                    <div class="ml-2 flex-shrink-0 flex">
+                                        <p class="text-sm text-gray-500">
+                                            {{ review.timestamp|date:"F d, Y" }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <h5 class="text-sm font-medium text-gray-900">{{ review.review_title }}</h5>
+                                    <div class="mt-1 flex items-center">
+                                        {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= review.review_score %}
+                                        <i class="fas fa-star text-yellow-400"></i>
+                                        {% else %}
+                                        <i class="far fa-star text-yellow-400"></i>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <p class="mt-2 text-sm text-gray-500">{{ review.review_content }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
                 <div class="px-4 py-5 sm:p-6">
-                    <p class="text-sm text-gray-500">No recent activity to show.</p>
+                    <p class="text-sm text-gray-500">You haven't written any reviews yet.</p>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>

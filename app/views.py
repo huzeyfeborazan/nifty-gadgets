@@ -56,7 +56,20 @@ def logout_view(request):
 def dashboard_view(request):
     """This is the dashboard page view"""
 
-    return render(request, 'app/dashboard.html', {'user': request.user})
+    # Get user's reviews with related product data
+    user_reviews = Review.objects.filter(user=request.user).select_related('product').order_by('-timestamp')
+
+    context = {
+        'user': request.user,
+        'user_reviews': user_reviews,
+        'total_reviews': request.user.total_reviews_by_user,
+        'total_upvotes': request.user.total_upvotes_by_user,
+        'total_downvotes': request.user.total_downvotes_by_user,
+        'total_comments': request.user.total_comments_by_user,
+        'total_interactions': request.user.total_interaction_by_user,
+    }
+
+    return render(request, 'app/dashboard.html', context)
 
 def feed_view(request):
     """This is the feed page view"""
@@ -110,6 +123,13 @@ def product_detail_view(request, product_id):
             action = request.POST.get('action')
 
             if action == 'upvote':
+                # Remove any existing downvote
+                had_downvote = Downvote.objects.filter(product=product, user=request.user).exists()
+                Downvote.objects.filter(product=product, user=request.user).delete()
+                if had_downvote:
+                    product.product_downvote_count = max(0, product.product_downvote_count - 1)
+                    product.save(update_fields=['product_downvote_count'])
+
                 # Toggle upvote
                 upvote, created = Upvote.objects.get_or_create(
                     product=product,
@@ -117,8 +137,28 @@ def product_detail_view(request, product_id):
                 )
                 if not created:
                     upvote.delete()
+                    # Decrease upvote count
+                    product.product_upvote_count = max(0, product.product_upvote_count - 1)
+                    request.user.total_upvotes_by_user = max(0, request.user.total_upvotes_by_user - 1)
+                    messages.success(request, 'Upvote removed.')
+                else:
+                    # Increase upvote count
+                    product.product_upvote_count += 1
+                    request.user.total_upvotes_by_user += 1
+                    messages.success(request, 'Upvote added successfully.')
+                product.save(update_fields=['product_upvote_count'])
+                request.user.save(update_fields=['total_upvotes_by_user'])
 
             elif action == 'downvote':
+                # Remove any existing upvote
+                had_upvote = Upvote.objects.filter(product=product, user=request.user).exists()
+                Upvote.objects.filter(product=product, user=request.user).delete()
+                if had_upvote:
+                    product.product_upvote_count = max(0, product.product_upvote_count - 1)
+                    request.user.total_upvotes_by_user = max(0, request.user.total_upvotes_by_user - 1)
+                    product.save(update_fields=['product_upvote_count'])
+                    request.user.save(update_fields=['total_upvotes_by_user'])
+
                 # Toggle downvote
                 downvote, created = Downvote.objects.get_or_create(
                     product=product,
@@ -126,7 +166,17 @@ def product_detail_view(request, product_id):
                 )
                 if not created:
                     downvote.delete()
-                messages.success(request, 'Downvote updated successfully.')
+                    # Decrease downvote count
+                    product.product_downvote_count = max(0, product.product_downvote_count - 1)
+                    request.user.total_downvotes_by_user = max(0, request.user.total_downvotes_by_user - 1)
+                    messages.success(request, 'Downvote removed.')
+                else:
+                    # Increase downvote count
+                    product.product_downvote_count += 1
+                    request.user.total_downvotes_by_user += 1
+                    messages.success(request, 'Downvote added successfully.')
+                product.save(update_fields=['product_downvote_count'])
+                request.user.save(update_fields=['total_downvotes_by_user'])
 
             elif action == 'comment':
                 comment_text = request.POST.get('comment_text')
@@ -136,16 +186,28 @@ def product_detail_view(request, product_id):
                         user=request.user,
                         comment_text=comment_text
                     )
+                    # Increase comment count
+                    product.product_comment_count += 1
+                    request.user.total_comments_by_user += 1
+                    product.save(update_fields=['product_comment_count'])
+                    request.user.save(update_fields=['total_comments_by_user'])
                     messages.success(request, 'Comment added successfully.')
                 else:
                     messages.error(request, 'Comment cannot be empty.')
 
             elif action == 'report':
-                Report.objects.create(
-                    product=product,
-                    user=request.user
-                )
-                messages.success(request, 'Product reported successfully.')
+                # Check if user has already reported
+                if not Report.objects.filter(product=product, user=request.user).exists():
+                    Report.objects.create(
+                        product=product,
+                        user=request.user
+                    )
+                    # Increase report count
+                    product.product_report_count += 1
+                    product.save(update_fields=['product_report_count'])
+                    messages.success(request, 'Product reported successfully.')
+                else:
+                    messages.warning(request, 'You have already reported this product.')
 
             elif action == 'review':
                 form = ReviewForm(request.POST)
@@ -154,12 +216,32 @@ def product_detail_view(request, product_id):
                     review.product = product
                     review.user = request.user
                     review.save()
+                    # Increase review count
+                    request.user.total_reviews_by_user += 1
+                    request.user.save(update_fields=['total_reviews_by_user'])
                     messages.success(request, 'Review added successfully.')
                 else:
                     messages.error(request, 'Please provide a valid review.')
 
-            return redirect('app:product_detail', product_id=product.id)
+            # Update total interaction counts
+            product.product_interaction_count = (
+                product.product_upvote_count +
+                product.product_downvote_count +
+                product.product_comment_count +
+                product.product_report_count
+            )
+            product.save(update_fields=['product_interaction_count'])
 
+            # Update user's total interactions
+            request.user.total_interaction_by_user = (
+                request.user.total_upvotes_by_user +
+                request.user.total_downvotes_by_user +
+                request.user.total_comments_by_user +
+                request.user.total_reviews_by_user
+            )
+            request.user.save(update_fields=['total_interaction_by_user'])
+
+            return redirect('app:product_detail', product_id=product.id)
 
     # Check if current user has interacted with the product
     if request.user.is_authenticated:
@@ -170,20 +252,23 @@ def product_detail_view(request, product_id):
     else:
         user_has_upvoted = user_has_downvoted = user_has_commented = user_has_reviewed = False
 
+    # Fetch reviews along with their authors and timestamps
+    reviews = Review.objects.filter(product=product).select_related('user').order_by('-timestamp')
 
     context = {
         'product': product,
+        'reviews': reviews,
         'user_has_upvoted': user_has_upvoted,
         'user_has_downvoted': user_has_downvoted,
         'user_has_commented': user_has_commented,
         'user_has_reviewed': user_has_reviewed,
         'review_form': ReviewForm(),
         'product_score': product.score,
-        'product_average_rating': product.average_rating,
-        'product_upvote_count': product.upvote_count,
-        'product_downvote_count': product.downvote_count,
-        'product_review_count': product.review_count,
-        'product_comment_count': product.comment_count,
+        'product_average_rating': product.annotated_average_rating,
+        'product_upvote_count': product.annotated_upvote_count,
+        'product_downvote_count': product.annotated_downvote_count,
+        'product_review_count': product.annotated_review_count,
+        'product_comment_count': product.annotated_comment_count,
     }
 
     return render(request, 'app/product_detail.html', context)

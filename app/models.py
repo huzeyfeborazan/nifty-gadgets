@@ -1,6 +1,7 @@
 ''' Models for the Nifty Gadgets application. '''
+from datetime import timedelta
 from django.db import models
-
+from django.utils import timezone
 
 class User(models.Model):
     """Model representing a user in the system."""
@@ -19,11 +20,16 @@ class User(models.Model):
     user_phone_number = models.CharField(max_length=20, default='')
     user_bio = models.TextField(default='')
     total_entries_by_user = models.IntegerField(default=0)
-    total_likes_by_user = models.IntegerField(default=0)
+    total_upvotes_by_user = models.IntegerField(default=0)
+    total_downvotes_by_user = models.IntegerField(default=0)
+    total_reviews_by_user = models.IntegerField(default=0)
     total_comments_by_user = models.IntegerField(default=0)
+    total_reports_by_user = models.IntegerField(default=0)
     total_interaction_by_user = models.IntegerField(default=0)
-    total_likes_received_by_user = models.IntegerField(default=0)
+    total_upvotes_received_by_user = models.IntegerField(default=0)
+    total_downvotes_received_by_user = models.IntegerField(default=0)
     total_comments_received_by_user = models.IntegerField(default=0)
+    total_reports_received_by_user = models.IntegerField(default=0)
     total_interactions_received_by_user = models.IntegerField(default=0)
     user_score = models.FloatField(default=0)
     user_is_trending = models.BooleanField(default=False)
@@ -61,6 +67,27 @@ class Product(models.Model):
     product_is_controversial = models.BooleanField(default=False)
     product_is_new = models.BooleanField(default=False)
 
+    def update_trending_status(self):
+        """Update the trending flag."""
+        if self.product_upvote_count > 50 or self.product_comment_count > 50:
+            self.product_is_trending = True
+            self.save(update_fields=['product_is_trending'])
+
+    def update_controversial_status(self):
+        """Update the controversial flag."""
+        if self.product_upvote_count > 50 and self.product_downvote_count > 50:
+            self.product_is_controversial = True
+            self.save(update_fields=['product_is_controversial'])
+
+    def update_featured_status(self):
+        """Update the featured flag."""
+
+
+    def update_new_status(self):
+        """Update the new flag (within 5 days)."""
+        if self.created_at >= timezone.now() - timedelta(days=5):
+            self.product_is_new = True
+            self.save(update_fields=['product_is_new'])
 
 class Review(models.Model):
     """Model representing a product review."""

@@ -58,11 +58,11 @@
                         <div class="flex items-center space-x-6">
                             <div class="flex items-center text-gray-500">
                                 <i class="fas fa-heart text-red-500 text-xl"></i>
-                                <span class="ml-2 text-lg">{{ product.like_count }} likes</span>
+                                <span class="ml-2 text-lg">{{ product.product_upvote_count }} upvotes</span>
                             </div>
                             <div class="flex items-center text-gray-500">
                                 <i class="fas fa-comment text-xl"></i>
-                                <span class="ml-2 text-lg">{{ product.comment_count }} comments</span>
+                                <span class="ml-2 text-lg">{{ product.product_comment_count }} comments</span>
                             </div>
                         </div>
 
@@ -78,19 +78,54 @@
                         {% endif %}
 
                         <!-- Interaction Buttons -->
-                        <div class="flex items-center space-x-4">
-                            <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                                <i class="fas fa-heart mr-2"></i>
-                                Like
-                            </button>
-                            <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                                <i class="fas fa-comment mr-2"></i>
-                                Comment
-                            </button>
-                            <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                <i class="fas fa-flag mr-2"></i>
-                                Report
-                            </button>
+                        <div class="flex space-x-4">
+                            <!-- Upvote Button -->
+                            <form method="POST" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="upvote">
+                                <button type="submit"
+                                        class="flex items-center px-4 py-2 {% if user_has_upvoted %}bg-green-500{% else %}bg-gray-500{% endif %} text-white rounded hover:bg-green-600">
+                                    <i class="fas fa-thumbs-up mr-2"></i>
+                                    Upvote ({{ product_upvote_count }})
+                                </button>
+                            </form>
+
+                            <!-- Downvote Button -->
+                            <form method="POST" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="downvote">
+                                <button type="submit"
+                                        class="flex items-center px-4 py-2 {% if user_has_downvoted %}bg-red-500{% else %}bg-gray-500{% endif %} text-white rounded hover:bg-red-600">
+                                    <i class="fas fa-thumbs-down mr-2"></i>
+                                    Downvote ({{ product_downvote_count }})
+                                </button>
+                            </form>
+
+                            <!-- Comment Form -->
+                            <form method="POST" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="comment">
+                                <div class="flex items-center space-x-2">
+                                    <input type="text" name="comment_text" placeholder="Write a comment..."
+                                           class="px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button type="submit"
+                                            class="flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                        <i class="fas fa-comment mr-2"></i>
+                                        Comment
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Report Button -->
+                            <form method="POST" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="report">
+                                <button type="submit"
+                                        class="flex items-center px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                                    <i class="fas fa-flag mr-2"></i>
+                                    Report
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -128,16 +163,57 @@
                 <p class="mt-1 max-w-2xl text-sm text-gray-500">What people are saying about this product.</p>
             </div>
             <div class="border-t border-gray-200">
-                {% if product.review_set.all %}
-                <div class="divide-y divide-gray-200">
-                    {% for review in product.review_set.all %}
+                <!-- Review Form -->
+                {% if user.is_authenticated %}
+                    {% if not user_has_reviewed %}
                     <div class="px-4 py-5 sm:px-6">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Write a Review</h3>
+                        <form method="POST" class="space-y-4">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="review">
+                            <div>
+                                <label for="{{ review_form.review_title.id_for_label }}" class="block text-sm font-medium text-gray-700">Title</label>
+                                {{ review_form.review_title }}
+                            </div>
+                            <div>
+                                <label for="{{ review_form.review_score.id_for_label }}" class="block text-sm font-medium text-gray-700">Rating</label>
+                                {{ review_form.review_score }}
+                            </div>
+                            <div>
+                                <label for="{{ review_form.review_content.id_for_label }}" class="block text-sm font-medium text-gray-700">Review</label>
+                                {{ review_form.review_content }}
+                            </div>
+                            <div>
+                                <button type="submit"
+                                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    Submit Review
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="px-4 py-5 sm:px-6">
+                        <p class="text-sm text-gray-500">You have already reviewed this product.</p>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="px-4 py-5 sm:px-6">
+                        <p class="text-sm text-gray-500">Please <a href="{% url 'app:login' %}" class="text-indigo-600 hover:text-indigo-500">log in</a> to write a review.</p>
+                    </div>
+                {% endif %}
+
+                <!-- Existing Reviews -->
+                {% if reviews %}
+                <div class="divide-y divide-gray-200">
+                    {% for review in reviews %}
+                    <div class="px-4 py-5 sm:px-6">
+                        <!-- Review Header -->
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-4">
                                 <h3 class="text-lg font-medium text-gray-900">{{ review.review_title }}</h3>
-                                <div class="ml-4 flex items-center">
+                                <div class="flex items-center">
                                     {% for i in "12345"|make_list %}
-                                    {% if forloop.counter <= review.review_rating %}
+                                    {% if forloop.counter <= review.review_score %}
                                     <i class="fas fa-star text-yellow-400"></i>
                                     {% else %}
                                     <i class="far fa-star text-yellow-400"></i>
@@ -146,11 +222,12 @@
                                 </div>
                             </div>
                             <div class="text-sm text-gray-500">
-                                By {{ review.user.username }} on {{ review.created_at|date:"F d, Y" }}
+                                By {{ review.user.username }} on {{ review.timestamp|date:"F d, Y" }}
                             </div>
                         </div>
-                        <div class="mt-4">
-                            <p class="text-sm text-gray-900">{{ review.review_content }}</p>
+                        <!-- Review Content -->
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-900 whitespace-pre-wrap">{{ review.review_content }}</p>
                         </div>
                     </div>
                     {% endfor %}
