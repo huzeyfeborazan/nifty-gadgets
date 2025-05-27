@@ -1,0 +1,77 @@
+{% extends "app/base.html" %}
+
+{% block title %}Add Product - Nifty Gadgets{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <!-- Header -->
+    <div class="bg-white shadow">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold text-gray-900">Add New Product</h1>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+
+                    <!-- Title -->
+                    <div>
+                        <label for="{{ form.product_title.id_for_label }}" class="block text-sm font-medium text-gray-700">Product Title</label>
+                        {{ form.product_title }}
+                        {% if form.product_title.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.product_title.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label for="{{ form.product_description.id_for_label }}" class="block text-sm font-medium text-gray-700">Description</label>
+                        {{ form.product_description }}
+                        {% if form.product_description.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.product_description.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Category -->
+                    <div>
+                        <label for="{{ form.product_category.id_for_label }}" class="block text-sm font-medium text-gray-700">Category</label>
+                        {{ form.product_category }}
+                        {% if form.product_category.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.product_category.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Price -->
+                    <div>
+                        <label for="{{ form.product_price.id_for_label }}" class="block text-sm font-medium text-gray-700">Price ($)</label>
+                        {{ form.product_price }}
+                        {% if form.product_price.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.product_price.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Image -->
+                    <div>
+                        <label for="{{ form.product_image.id_for_label }}" class="block text-sm font-medium text-gray-700">Product Image</label>
+                        {{ form.product_image }}
+                        {% if form.product_image.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.product_image.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex justify-end">
+                        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Add Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
