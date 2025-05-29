@@ -2,7 +2,7 @@
 
 from app.views.auth_views import register_view, login_view, logout_view
 from app.views.core_views import home, dashboard_view
-from app.views.feed_view import feed_view
+from app.views.feed_views import feed_view
 from app.views.feed_interaction_views import (
     feed_upvote_product_view,
     feed_downvote_product_view,
