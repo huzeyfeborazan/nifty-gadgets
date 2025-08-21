@@ -119,3 +119,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
+
+DEBUG = True
+ALLOWED_HOSTS = ["*", "localhost", "127.0.0.1"]
+
+# Do NOT force HTTPS in dev
+SECURE_SSL_REDIRECT = False
+SECURE_HSTS_SECONDS = 0
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+
+# Only use this behind a real TLS-terminating proxy.
+# If you had it set, unset it in dev so Django doesn't think the request is HTTPS.
+SECURE_PROXY_SSL_HEADER = None
