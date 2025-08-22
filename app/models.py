@@ -2,18 +2,16 @@
 from datetime import timedelta
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
 
-class User(models.Model):
+
+class User(AbstractUser):
     """Model representing a user in the system."""
     user_id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=255, unique=True)
-    password = models.CharField(max_length=255)
-    safety_question = models.CharField(max_length=255)
-    safety_answer = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     user_name = models.TextField(default='')
     user_lastname = models.TextField(default='')
-    user_date_of_birth = models.DateField(default='')
+    user_date_of_birth = models.DateField(null=True, blank=True)
     user_age = models.IntegerField(default=0)
     user_email = models.EmailField(unique=True)
     user_security_email = models.EmailField(default='')

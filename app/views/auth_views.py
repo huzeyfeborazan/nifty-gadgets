@@ -3,12 +3,15 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm
+from ..forms import RegistrationForm
 
 def register_view(request):
     """This is the register page view"""
+    if request.user.is_authenticated:
+        return redirect('app:dashboard')  # Redirect to dashboard if user is already logged in
+
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
@@ -16,12 +19,15 @@ def register_view(request):
             return redirect('app:dashboard')
         for field, errors in form.errors.items():
             for error in errors:
-                messages.error(request, f"{field}: {error}")
-    form = UserCreationForm()
+                messages.error(request, error)
+    form = RegistrationForm()
     return render(request, 'app/register.html', {'form': form})
 
 def login_view(request):
     """This is the login page view"""
+    if request.user.is_authenticated:
+        return redirect('app:dashboard')  # Redirect to dashboard if user is already logged in
+
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')

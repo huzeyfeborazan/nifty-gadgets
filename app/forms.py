@@ -2,6 +2,13 @@
 
 from django import forms
 from .models import Product, Review
+from django.contrib.auth.forms import UserCreationForm
+from .models import User
+
+class RegistrationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ('username',)  # password fields are automatically included by UserCreationForm
 
 class ProductForm(forms.ModelForm):
     """Form for adding a new product."""
