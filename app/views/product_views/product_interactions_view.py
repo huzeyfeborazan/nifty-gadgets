@@ -7,6 +7,8 @@ from django.shortcuts import get_object_or_404, redirect
 
 from app.forms import ReviewForm
 from app.models import Product, Upvote, Downvote, Comment, Report
+from app.views.product_views.calculate_product_score import calculate_product_score
+
 
 @login_required
 def handle_product_interaction(request, product_id):
@@ -26,6 +28,7 @@ def handle_product_interaction(request, product_id):
         handle_report(request, product)
 
     update_interaction_counts(product, request.user)
+    calculate_product_score(product.id)
     return redirect('app:product_detail', product_id=product.id)
 
 @transaction.atomic

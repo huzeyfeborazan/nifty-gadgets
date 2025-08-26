@@ -3,8 +3,8 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from app.models import ProductCategory
 from app.forms import ProductForm
+from app.models import Product
 
 @login_required
 def add_product_view(request):
@@ -25,8 +25,9 @@ def add_product_view(request):
     else:
         form = ProductForm()
 
+
     context = {
         'form': form,
-        'categories': ProductCategory.objects.all()
+        'categories': Product.CATEGORY_CHOICES
     }
     return render(request, 'app/add_product.html', context)

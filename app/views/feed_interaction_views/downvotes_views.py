@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 
 from app.models import Product
 from app.views.product_views.product_interactions_view import handle_downvote
+from app.views.product_views.calculate_product_score import calculate_product_score
 
 @login_required
 @transaction.atomic
@@ -17,6 +18,12 @@ def feed_downvote_product_view(request, product_id):
 
         # Use the existing handle_downvote function
         handle_downvote(request, product)
+
+        # Refresh product data to get updated counts
+        product.refresh_from_db()
+
+        # Calculate product score and update it in the database
+        calculate_product_score(product.id)
 
         # Check if user has downvoted after handling
         from app.models import Downvote

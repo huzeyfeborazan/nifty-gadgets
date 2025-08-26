@@ -34,22 +34,29 @@ class User(AbstractUser):
     user_is_featured = models.BooleanField(default=False)
     user_is_affiliate = models.BooleanField(default=False)
 
-
-class ProductCategory(models.Model):
-    """Model representing a product category."""
-    product_category_id = models.AutoField(primary_key=True)
-    product_category_title = models.CharField(max_length=255, unique=True)
-
-
 class Product(models.Model):
     """Model representing a product."""
     product_id = models.AutoField(primary_key=True)
     product_title = models.CharField(max_length=255)
     product_description = models.TextField(default='')
-    product_category = models.ForeignKey(ProductCategory, on_delete=models.CASCADE,
-                                         related_name='products')
+
+    CATEGORY_CHOICES = [
+        ('productivity_tools', 'Productivity Tools'),
+        ('mobile_accessories', 'Mobile Accessories'),
+        ('smart_home_essentials', 'Smart Home Essentials'),
+        ('gaming_accessories', 'Gaming Accessories'),
+        ('audio_accessories', 'Audio Accessories'),
+        ('camera_accessories', 'Camera Accessories'),
+        ('office_essentials', 'Office Essentials'),
+        ('travel_essentials', 'Travel Essentials'),
+        ('health_and_fitness', 'Health and Fitness'),
+        ('home_and_garden', 'Home and Garden'),
+        ('other', 'Other'),
+    ]
+    product_category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='other')
     product_price = models.DecimalField(max_digits=10, decimal_places=2)
     product_image = models.ImageField(upload_to='product_images/', null=True, blank=True)
+    product_link = models.URLField(max_length=500, blank=True, null=True, help_text="Link to purchase the product")
     author_user = models.ForeignKey(User, on_delete=models.CASCADE,
                                     related_name='products')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -59,12 +66,14 @@ class Product(models.Model):
     product_interaction_count = models.IntegerField(default=0)
     product_report_count = models.IntegerField(default=0)
     product_average_rating = models.FloatField(default=0)
-    product_total_score = models.FloatField()
+    product_score = models.FloatField(default=0)
     product_is_trending = models.BooleanField(default=False)
     product_is_featured = models.BooleanField(default=False)
     product_is_promoted = models.BooleanField(default=False)
     product_is_controversial = models.BooleanField(default=False)
     product_is_new = models.BooleanField(default=False)
+    product_is_popular = models.BooleanField(default=False)
+
 
     def update_trending_status(self):
         """Update the trending flag."""
@@ -77,10 +86,6 @@ class Product(models.Model):
         if self.product_upvote_count > 50 and self.product_downvote_count > 50:
             self.product_is_controversial = True
             self.save(update_fields=['product_is_controversial'])
-
-    def update_featured_status(self):
-        """Update the featured flag."""
-
 
     def update_new_status(self):
         """Update the new flag (within 5 days)."""

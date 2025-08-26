@@ -33,13 +33,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='ProductCategory',
-            fields=[
-                ('product_category_id', models.AutoField(primary_key=True, serialize=False)),
-                ('product_category_title', models.CharField(max_length=255, unique=True)),
-            ],
-        ),
-        migrations.CreateModel(
             name='User',
             fields=[
                 ('user_id', models.AutoField(primary_key=True, serialize=False)),
@@ -102,11 +95,6 @@ class Migration(migrations.Migration):
             model_name='product',
             name='author_user',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='app.user'),
-        ),
-        migrations.AddField(
-            model_name='product',
-            name='product_category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='app.productcategory'),
         ),
         migrations.CreateModel(
             name='Downvote',

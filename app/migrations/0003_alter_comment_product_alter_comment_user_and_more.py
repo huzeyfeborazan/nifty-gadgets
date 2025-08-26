@@ -37,11 +37,6 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='products', to='app.user'),
         ),
         migrations.AlterField(
-            model_name='product',
-            name='product_category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='products', to='app.productcategory'),
-        ),
-        migrations.AlterField(
             model_name='report',
             name='product',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reports', to='app.product'),

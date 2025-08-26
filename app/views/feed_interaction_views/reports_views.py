@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 
 from app.models import Product
 from app.views.product_views.product_interactions_view import handle_report
+from app.views.product_views.calculate_product_score import calculate_product_score
 
 @login_required
 @transaction.atomic
@@ -28,6 +29,12 @@ def feed_report_product_view(request, product_id):
         else:
             # Use the existing handle_report function
             handle_report(request, product)
+
+            # Refresh product data to get updated counts
+            product.refresh_from_db()
+
+            # Calculate product score and update it in the database
+            calculate_product_score(product.id)
 
             return JsonResponse({
                 'reported': True,

@@ -3,7 +3,6 @@
 from django.contrib import admin
 from .models import (
     User,
-    ProductCategory,
     Product,
     Review,
     Upvote,
@@ -19,13 +18,6 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'user_email', 'created_at', 'user_is_trending')
     search_fields = ('username', 'user_email')
     list_filter = ('user_is_trending', 'user_is_featured', 'user_is_affiliate')
-
-
-@admin.register(ProductCategory)
-class ProductCategoryAdmin(admin.ModelAdmin):
-    """Admin configuration for ProductCategory model."""
-    list_display = ('product_category_title',)
-    search_fields = ('product_category_title',)
 
 
 @admin.register(Product)

@@ -9,7 +9,7 @@ from app.forms import ReviewForm
 from app.views.product_views.product_interactions_view import (
     handle_review, handle_upvote, handle_downvote, handle_comment, handle_report
 )
-
+from app.views.product_views.calculate_product_score import calculate_product_score
 
 def get_user_interactions(product, user):
     """Show previous interactions of user viewing the product."""
@@ -19,16 +19,6 @@ def get_user_interactions(product, user):
     user_has_reviewed = Review.objects.filter(product=product, user=user).exists()
     return user_has_upvoted, user_has_downvoted, user_has_commented, user_has_reviewed
 
-def calculate_product_score(product):
-    """Calculate product score for internal use such as sorting products."""
-    total_vote_count = product.annotated_upvote_count + product.annotated_downvote_count
-    net_vote_count = product.annotated_upvote_count - product.annotated_downvote_count
-    denominator = total_vote_count * product.annotated_review_count
-    product.score = (
-        net_vote_count * product.annotated_average_rating /
-        denominator if denominator > 0 else 0
-    )
-    return product.score
 
 def product_detail_view(request, product_id):
     """View for displaying product details."""
@@ -36,11 +26,11 @@ def product_detail_view(request, product_id):
     # Calculate product statistics
     product = get_object_or_404(
         Product.objects.annotate(
-            annotated_average_rating=Avg('review__review_score'),
-            annotated_review_count=Count('review'),
-            annotated_upvote_count=Count('upvote'),
-            annotated_downvote_count=Count('downvote'),
-            annotated_comment_count=Count('comment')
+            annotated_average_rating=Avg('reviews__review_score'),
+            annotated_review_count=Count('reviews'),
+            annotated_upvote_count=Count('upvotes'),
+            annotated_downvote_count=Count('downvotes'),
+            annotated_comment_count=Count('comments')
         ),
         id=product_id
     )
@@ -49,7 +39,7 @@ def product_detail_view(request, product_id):
     product.annotated_average_rating = product.annotated_average_rating or 0
 
     # Calculate product score (for internal use)
-    product.score = calculate_product_score(product)
+    product.score = calculate_product_score(product.id)
 
     # Check if current user has interacted with the product
     user = request.user

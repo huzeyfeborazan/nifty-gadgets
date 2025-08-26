@@ -20,6 +20,7 @@ urlpatterns = [
     path('product/<int:product_id>/downvote/', views.feed_downvote_product_view, name='feed_downvote_product'),
     path('product/<int:product_id>/report/', views.feed_report_product_view, name='feed_report_product'),
     path('product/<int:product_id>/comment/', views.feed_comment_product_view, name='feed_comment_product'),
+    path('lists/', views.lists_view, name='lists'),
 ]
 
 if settings.DEBUG:
