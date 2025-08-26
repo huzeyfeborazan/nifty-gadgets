@@ -106,7 +106,7 @@ def handle_comment(request, product):
         Comment.objects.create(
             product=product,
             user=request.user,
-            comment_text=comment_text
+            comment_content=comment_text
         )
         # Increase comment count
         product.product_comment_count += 1

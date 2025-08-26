@@ -12,6 +12,16 @@ def add_product_view(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
+            # Additional validation to ensure category is selected
+            category = form.cleaned_data.get('product_category')
+            if not category:
+                messages.error(request, 'Please select a category.')
+                context = {
+                    'form': form,
+                    'categories': Product.CATEGORY_CHOICES
+                }
+                return render(request, 'app/add_product.html', context)
+
             product = form.save(commit=False)
             product.author_user = request.user
             product.save()
@@ -21,7 +31,11 @@ def add_product_view(request):
             request.user.save(update_fields=['total_entries_by_user'])
 
             messages.success(request, 'Product added successfully!')
-            return redirect('app:product_detail', product_id=product.product_id)
+            return redirect('app:product_detail', product_id=product.id)
+        else:
+            # Debug: print form errors to console
+            print("Form errors:", form.errors)
+            print("Form data:", request.POST)
     else:
         form = ProductForm()
 

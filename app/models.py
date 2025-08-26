@@ -7,11 +7,10 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     """Model representing a user in the system."""
-    user_id = models.AutoField(primary_key=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     user_name = models.TextField(default='')
     user_lastname = models.TextField(default='')
-    user_date_of_birth = models.DateField(null=True, blank=True)
     user_age = models.IntegerField(default=0)
     user_email = models.EmailField(unique=True)
     user_security_email = models.EmailField(default='')
@@ -36,7 +35,6 @@ class User(AbstractUser):
 
 class Product(models.Model):
     """Model representing a product."""
-    product_id = models.AutoField(primary_key=True)
     product_title = models.CharField(max_length=255)
     product_description = models.TextField(default='')
 
@@ -95,7 +93,6 @@ class Product(models.Model):
 
 class Review(models.Model):
     """Model representing a product review."""
-    review_id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE,
                                 related_name='reviews')
     user = models.ForeignKey(User, on_delete=models.CASCADE,
@@ -108,7 +105,6 @@ class Review(models.Model):
 
 class Upvote(models.Model):
     """Model representing a product upvote."""
-    upvote_id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE,
                                 related_name='upvotes')
     user = models.ForeignKey(User, on_delete=models.CASCADE,
@@ -118,7 +114,6 @@ class Upvote(models.Model):
 
 class Downvote(models.Model):
     """Model representing a product downvote."""
-    downvote_id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE,
                                 related_name='downvotes')
     user = models.ForeignKey(User, on_delete=models.CASCADE,
@@ -128,7 +123,6 @@ class Downvote(models.Model):
 
 class Comment(models.Model):
     """Model representing a product comment."""
-    comment_id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE,
                                 related_name='comments')
     user = models.ForeignKey(User, on_delete=models.CASCADE,
@@ -139,7 +133,6 @@ class Comment(models.Model):
 
 class Report(models.Model):
     """Model representing a product report."""
-    report_id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE,
                                 related_name='reports')
     user = models.ForeignKey(User, on_delete=models.CASCADE,

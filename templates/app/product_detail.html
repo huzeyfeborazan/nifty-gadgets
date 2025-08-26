@@ -12,6 +12,7 @@
                 <h1 class="text-3xl font-bold text-gray-900">{{ product.product_title }}</h1>
                 <div class="flex items-center">
                     <span class="text-2xl font-bold text-gray-900">${{ product.product_price }}</span>
+                    <span class="ml-3 text-sm text-gray-500">{{ product_review_count }} {% if product_review_count == 1 %}review{% else %}reviews{% endif %}</span>
                     {% if product.product_is_trending %}
                     <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                         Trending
@@ -45,25 +46,21 @@
                         <div class="flex items-center">
                             <div class="flex items-center">
                                 {% for i in "12345"|make_list %}
-                                {% if forloop.counter <= product.average_rating %}
+                                {% if forloop.counter <= product_average_rating %}
                                 <i class="fas fa-star text-yellow-400 text-2xl"></i>
                                 {% else %}
                                 <i class="far fa-star text-yellow-400 text-2xl"></i>
                                 {% endif %}
                                 {% endfor %}
-                                <span class="ml-2 text-lg text-gray-500">({{ product.review_count }} reviews)</span>
+                                <span class="ml-2 text-lg text-gray-500">({{ product_review_count }} {% if product_review_count == 1 %}review{% else %}reviews{% endif %})</span>
                             </div>
                         </div>
 
                         <!-- Like and Comment Counts -->
                         <div class="flex items-center space-x-6">
                             <div class="flex items-center text-gray-500">
-                                <i class="fas fa-heart text-red-500 text-xl"></i>
-                                <span class="ml-2 text-lg">{{ product.product_upvote_count }} upvotes</span>
-                            </div>
-                            <div class="flex items-center text-gray-500">
                                 <i class="fas fa-comment text-xl"></i>
-                                <span class="ml-2 text-lg">{{ product.product_comment_count }} comments</span>
+                                <span id="comment-count" class="ml-2 text-lg">{{ product_comment_count }}</span>
                             </div>
                         </div>
 
@@ -79,42 +76,48 @@
                         {% endif %}
 
                         <!-- Interaction Buttons -->
-                        <div class="flex space-x-4">
-                            <!-- Upvote Button -->
-                            <button id="upvote-btn"
-                                    class="flex items-center px-4 py-2 {% if user_has_upvoted %}bg-green-500{% else %}bg-gray-500{% endif %} text-white rounded hover:bg-green-600"
-                                    data-action="upvote">
-                                <i class="fas fa-thumbs-up mr-2"></i>
-                                <span id="upvote-text">Upvote ({{ product_upvote_count }})</span>
-                            </button>
+                        <div class="space-y-4">
+                            <!-- Upvote and Downvote Buttons -->
+                            <div class="flex space-x-4">
+                                <!-- Upvote Button -->
+                                <button id="upvote-btn"
+                                        class="flex items-center px-4 py-2 {% if user_has_upvoted %}bg-green-500{% else %}bg-gray-500{% endif %} text-white rounded hover:bg-green-600"
+                                        data-action="upvote">
+                                    <i class="fas fa-thumbs-up mr-2"></i>
+                                    <span id="upvote-text">Upvote ({{ product_upvote_count }})</span>
+                                </button>
 
-                            <!-- Downvote Button -->
-                            <button id="downvote-btn"
-                                    class="flex items-center px-4 py-2 {% if user_has_downvoted %}bg-red-500{% else %}bg-gray-500{% endif %} text-white rounded hover:bg-red-600"
-                                    data-action="downvote">
-                                <i class="fas fa-thumbs-down mr-2"></i>
-                                <span id="downvote-text">Downvote ({{ product_downvote_count }})</span>
-                            </button>
+                                <!-- Downvote Button -->
+                                <button id="downvote-btn"
+                                        class="flex items-center px-4 py-2 {% if user_has_downvoted %}bg-red-500{% else %}bg-gray-500{% endif %} text-white rounded hover:bg-red-600"
+                                        data-action="downvote">
+                                    <i class="fas fa-thumbs-down mr-2"></i>
+                                    <span id="downvote-text">Downvote ({{ product_downvote_count }})</span>
+                                </button>
 
-                            <!-- Comment Form -->
-                            <div class="flex items-center space-x-2">
-                                <input type="text" id="comment-input" placeholder="Write a comment..."
-                                       class="px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <button id="comment-btn"
-                                        class="flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                        data-action="comment">
-                                    <i class="fas fa-comment mr-2"></i>
-                                    Comment
+                                <!-- Report Button -->
+                                <button id="report-btn"
+                                        class="flex items-center px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                                        data-action="report">
+                                    <i class="fas fa-flag mr-2"></i>
+                                    Report
                                 </button>
                             </div>
 
-                            <!-- Report Button -->
-                            <button id="report-btn"
-                                    class="flex items-center px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                                    data-action="report">
-                                <i class="fas fa-flag mr-2"></i>
-                                Report
-                            </button>
+                            <!-- Comment Section -->
+                            <div class="border-t pt-4">
+                                <h3 class="text-lg font-medium text-gray-900 mb-3">Add a Comment</h3>
+                                <div class="flex items-center space-x-2">
+                                    <input type="text" id="comment-input" placeholder="Write a comment..."
+                                           class="flex-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <button id="comment-btn"
+                                            class="flex items-center px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                                            data-action="comment">
+                                        <i class="fas fa-comment mr-2"></i>
+                                        Comment
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -146,7 +149,7 @@
         </div>
 
         <!-- Reviews Section -->
-        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
             <div class="px-4 py-5 sm:px-6">
                 <h2 class="text-lg leading-6 font-medium text-gray-900">Reviews</h2>
                 <p class="mt-1 max-w-2xl text-sm text-gray-500">What people are saying about this product.</p>
@@ -228,9 +231,42 @@
                 {% endif %}
             </div>
         </div>
+
+        <!-- Comments Section -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
+            <div class="px-4 py-5 sm:px-6">
+                <h2 class="text-lg leading-6 font-medium text-gray-900">Comments</h2>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">What people are discussing about this product.</p>
+            </div>
+            <div class="border-t border-gray-200">
+                <!-- Existing Comments -->
+                {% if product.comments.all %}
+                <div class="divide-y divide-gray-200">
+                    {% for comment in product.comments.all %}
+                    <div class="px-4 py-5 sm:px-6">
+                        <!-- Comment Header -->
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-sm text-gray-500">
+                                By {{ comment.user.username }} on {{ comment.timestamp|date:"F d, Y" }}
+                            </div>
+                        </div>
+                        <!-- Comment Content -->
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-900 whitespace-pre-wrap">{{ comment.comment_content }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="px-4 py-5 sm:px-6">
+                    <p class="text-sm text-gray-500">No comments yet. Be the first to comment on this product!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
         </div>
 </div>
 
 <!-- Product Detail JavaScript -->
-<script type="module" src="{% static 'app/product-detail.js' %}"></script>
+<script src="{% static 'app/product-detail.js' %}"></script>
 {% endblock %}

@@ -32,6 +32,7 @@ def feed_downvote_product_view(request, product_id):
         return JsonResponse({
             'downvoted': downvoted,
             'total_downvotes': product.product_downvote_count,
+            'total_upvotes': product.product_upvote_count,
         })
 
     return JsonResponse({'error': 'POST request required'}, status=400)

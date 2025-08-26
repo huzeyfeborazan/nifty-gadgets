@@ -3,11 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>{% block title %}Nifty Gadgets{% endblock %}</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script>
+        function navigateToSection(sectionId) {
+            console.log('Navigating to section:', sectionId);
+
+            // Store the target section in localStorage
+            localStorage.setItem('targetSection', sectionId);
+
+            // Navigate to the lists page
+            window.location.href = "{% url 'app:lists' %}";
+        }
+
+        // Check for target section when the page loads
+        window.addEventListener('load', function() {
+            const targetSection = localStorage.getItem('targetSection');
+            if (targetSection) {
+                console.log('Found target section in localStorage:', targetSection);
+                localStorage.removeItem('targetSection'); // Clear it after use
+
+                setTimeout(function() {
+                    const element = document.getElementById(targetSection);
+                    if (element) {
+                        console.log('Scrolling to element:', targetSection);
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        console.log('Element not found:', targetSection);
+                        console.log('Available IDs on page:', Array.from(document.querySelectorAll('[id]')).map(el => el.id));
+                    }
+                }, 300);
+            }
+
+            // Also handle direct anchor links
+            const hash = window.location.hash;
+            if (hash) {
+                console.log('Page loaded with hash:', hash);
+                const sectionId = hash.substring(1);
+                setTimeout(function() {
+                    const element = document.getElementById(sectionId);
+                    if (element) {
+                        console.log('Scrolling to hash element:', sectionId);
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        console.log('Hash element not found:', sectionId);
+                        console.log('Available IDs on page:', Array.from(document.querySelectorAll('[id]')).map(el => el.id));
+                    }
+                }, 500); // Increased timeout for hash navigation
+            }
+        });
+
+        // Also try with DOMContentLoaded for better timing
+        document.addEventListener('DOMContentLoaded', function() {
+            const hash = window.location.hash;
+            if (hash) {
+                console.log('DOM ready with hash:', hash);
+                const sectionId = hash.substring(1);
+                setTimeout(function() {
+                    const element = document.getElementById(sectionId);
+                    if (element) {
+                        console.log('DOM ready - scrolling to hash element:', sectionId);
+                        // Try multiple scroll methods for better compatibility
+                        try {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        } catch (e) {
+                            console.log('Smooth scroll failed, using instant scroll');
+                            element.scrollIntoView();
+                        }
+
+                        // Add visual highlight to confirm we're in the right place
+                        element.style.border = '3px solid #10B981';
+                        element.style.borderRadius = '8px';
+                        setTimeout(() => {
+                            element.style.border = '';
+                            element.style.borderRadius = '';
+                        }, 2000);
+                    }
+                }, 100);
+            }
+        });
+    </script>
 </head>
 <body class="bg-gray-100">
     <nav class="bg-white shadow-lg">
@@ -17,11 +96,11 @@
                     <div class="flex-shrink-0 flex items-center">
                         <a href="{% url 'app:home' %}" class="text-xl font-bold text-indigo-600">Nifty Gadgets</a>
                     </div>
-                    <div class="hidden md:ml-6 md:flex md:space-x-8">
-                        <a href="{% url 'app:home' %}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <div class="hidden md:ml-6 md:flex md:space-x-8 md:items-center">
                         <a href="{% url 'app:feed' %}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Feed</a>
                         <a href="{% url 'app:lists' %}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Lists</a>
                         {% if user.is_authenticated %}
+                        <a href="{% url 'app:add_product' %}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Add a Product</a>
                         <a href="{% url 'app:dashboard' %}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
                         {% endif %}
                     </div>
