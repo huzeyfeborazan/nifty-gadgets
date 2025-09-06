@@ -26,10 +26,6 @@ def add_product_view(request):
             product.author_user = request.user
             product.save()
 
-            # Update user's total entries
-            request.user.total_entries_by_user += 1
-            request.user.save(update_fields=['total_entries_by_user'])
-
             messages.success(request, 'Product added successfully!')
             return redirect('app:product_detail', product_id=product.id)
         else:

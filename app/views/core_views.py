@@ -12,16 +12,16 @@ def home(request):
 def dashboard_view(request):
     """This is the dashboard page view"""
     # Get user's reviews with related product data
-    user_reviews = Review.objects.filter(user=request.user).select_related('product').order_by('-timestamp')
+    user_reviews = Review.objects.filter(user=request.user).select_related('product').order_by('-created_at')
 
     context = {
         'user': request.user,
         'user_reviews': user_reviews,
-        'total_reviews': request.user.total_reviews_by_user,
-        'total_upvotes': request.user.total_upvotes_by_user,
-        'total_downvotes': request.user.total_downvotes_by_user,
-        'total_comments': request.user.total_comments_by_user,
-        'total_interactions': request.user.total_interaction_by_user,
+        'total_reviews': request.user.get_total_reviews(),
+        'total_upvotes': request.user.get_total_upvotes_given(),
+        'total_downvotes': request.user.get_total_downvotes_given(),
+        'total_comments': request.user.get_total_comments(),
+        'total_products': request.user.get_total_products(),
     }
 
     return render(request, 'app/dashboard.html', context)

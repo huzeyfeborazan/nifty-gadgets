@@ -4,6 +4,8 @@
 {% block title %}Curated Lists - Nifty Gadgets{% endblock %}
 
 {% block content %}
+<!-- CSRF Token for AJAX requests -->
+{% csrf_token %}
 <div class="min-h-screen bg-gray-100">
     <!-- Header -->
     <div class="bg-white shadow">
@@ -25,8 +27,8 @@
     <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
 
         <!-- Best Productivity Tools -->
-        <div id="best-productivity-tools" class="mb-16">
-            <div class="flex items-center justify-between mb-6">
+        <div id="best-productivity-tools" class="mb-20">
+            <div class="flex items-center justify-between mb-8">
                 <h2 class="text-2xl font-bold text-gray-900">Best Productivity Tools</h2>
                 <span class="text-sm text-gray-500">Top-rated productivity solutions</span>
             </div>
@@ -67,8 +69,8 @@
                                 <span class="ml-1 text-sm text-gray-500">({{ product.review_count }})</span>
                             </div>
                             <div class="ml-4 flex items-center text-sm text-gray-500">
-                                <i class="fas fa-heart text-red-500"></i>
-                                <span class="ml-1">{{ product.product_upvote_count }}</span>
+                                <i class="fas fa-comment"></i>
+                                <span class="ml-1">{{ product.product_comment_count }}</span>
                             </div>
                         </div>
 
@@ -84,6 +86,49 @@
                             </a>
                         </div>
                         {% endif %}
+
+                        <!-- Interaction Buttons -->
+                        <div class="mt-4 space-y-3">
+                            <!-- Vote Buttons Row -->
+                            <div class="flex items-center space-x-2">
+                                <!-- Upvote Button -->
+                                <button type="button"
+                                        class="upvote-btn inline-flex items-center px-2 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                        data-id="{{ product.id }}">
+                                    <i class="fas fa-thumbs-up mr-1"></i>
+                                    <span class="upvote-count">{{ product.product_upvote_count }}</span>
+                                </button>
+
+                                <!-- Downvote Button -->
+                                <button type="button"
+                                        class="downvote-btn inline-flex items-center px-2 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                        data-id="{{ product.id }}">
+                                    <i class="fas fa-thumbs-down mr-1"></i>
+                                    <span class="downvote-count">{{ product.product_downvote_count }}</span>
+                                </button>
+
+                                <!-- Report Button -->
+                                <button type="button"
+                                        class="report-btn inline-flex items-center px-2 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                        data-id="{{ product.id }}">
+                                    <i class="fas fa-flag mr-1"></i>
+                                    Report
+                                </button>
+                            </div>
+
+                            <!-- Comment Form Row -->
+                            <div class="flex items-center space-x-2">
+                                <input type="text" name="comment_text" placeholder="Write a comment..."
+                                       class="comment-input flex-1 px-2 py-1 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                       data-id="{{ product.id }}">
+                                <button type="button"
+                                        class="comment-btn inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 whitespace-nowrap"
+                                        data-id="{{ product.id }}">
+                                    <i class="fas fa-comment mr-1"></i>
+                                    Comment
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 {% empty %}
@@ -95,8 +140,8 @@
         </div>
 
         <!-- Essential Mobile Accessories -->
-        <div id="essential-mobile-accessories" class="mb-16">
-            <div class="flex items-center justify-between mb-6">
+        <div id="essential-mobile-accessories" class="mb-20">
+            <div class="flex items-center justify-between mb-8">
                 <h2 class="text-2xl font-bold text-gray-900">Essential Mobile Accessories</h2>
                 <span class="text-sm text-gray-500">Must-have mobile gear</span>
             </div>
@@ -137,8 +182,8 @@
                                 <span class="ml-1 text-sm text-gray-500">({{ product.review_count }})</span>
                             </div>
                             <div class="ml-4 flex items-center text-sm text-gray-500">
-                                <i class="fas fa-heart text-red-500"></i>
-                                <span class="ml-1">{{ product.product_upvote_count }}</span>
+                                <i class="fas fa-comment"></i>
+                                <span class="ml-1">{{ product.product_comment_count }}</span>
                             </div>
                         </div>
 
@@ -154,6 +199,49 @@
                             </a>
                         </div>
                         {% endif %}
+
+                        <!-- Interaction Buttons -->
+                        <div class="mt-4 space-y-3">
+                            <!-- Vote Buttons Row -->
+                            <div class="flex items-center space-x-2">
+                                <!-- Upvote Button -->
+                                <button type="button"
+                                        class="upvote-btn inline-flex items-center px-2 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                        data-id="{{ product.id }}">
+                                    <i class="fas fa-thumbs-up mr-1"></i>
+                                    <span class="upvote-count">{{ product.product_upvote_count }}</span>
+                                </button>
+
+                                <!-- Downvote Button -->
+                                <button type="button"
+                                        class="downvote-btn inline-flex items-center px-2 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                        data-id="{{ product.id }}">
+                                    <i class="fas fa-thumbs-down mr-1"></i>
+                                    <span class="downvote-count">{{ product.product_downvote_count }}</span>
+                                </button>
+
+                                <!-- Report Button -->
+                                <button type="button"
+                                        class="report-btn inline-flex items-center px-2 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                        data-id="{{ product.id }}">
+                                    <i class="fas fa-flag mr-1"></i>
+                                    Report
+                                </button>
+                            </div>
+
+                            <!-- Comment Form Row -->
+                            <div class="flex items-center space-x-2">
+                                <input type="text" name="comment_text" placeholder="Write a comment..."
+                                       class="comment-input flex-1 px-2 py-1 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                       data-id="{{ product.id }}">
+                                <button type="button"
+                                        class="comment-btn inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 whitespace-nowrap"
+                                        data-id="{{ product.id }}">
+                                    <i class="fas fa-comment mr-1"></i>
+                                    Comment
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 {% empty %}
@@ -165,8 +253,8 @@
         </div>
 
         <!-- Smart Home Essentials -->
-        <div id="smart-home-essentials" class="mb-16">
-            <div class="flex items-center justify-between mb-6">
+        <div id="smart-home-essentials" class="mb-20">
+            <div class="flex items-center justify-between mb-8">
                 <h2 class="text-2xl font-bold text-gray-900">Smart Home Essentials</h2>
                 <span class="text-sm text-gray-500">Trending smart home products</span>
             </div>
@@ -207,8 +295,8 @@
                                 <span class="ml-1 text-sm text-gray-500">({{ product.review_count }})</span>
                             </div>
                             <div class="ml-4 flex items-center text-sm text-gray-500">
-                                <i class="fas fa-heart text-red-500"></i>
-                                <span class="ml-1">{{ product.product_upvote_count }}</span>
+                                <i class="fas fa-comment"></i>
+                                <span class="ml-1">{{ product.product_comment_count }}</span>
                             </div>
                         </div>
 
@@ -224,6 +312,49 @@
                             </a>
                         </div>
                         {% endif %}
+
+                        <!-- Interaction Buttons -->
+                        <div class="mt-4 space-y-3">
+                            <!-- Vote Buttons Row -->
+                            <div class="flex items-center space-x-2">
+                                <!-- Upvote Button -->
+                                <button type="button"
+                                        class="upvote-btn inline-flex items-center px-2 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                        data-id="{{ product.id }}">
+                                    <i class="fas fa-thumbs-up mr-1"></i>
+                                    <span class="upvote-count">{{ product.product_upvote_count }}</span>
+                                </button>
+
+                                <!-- Downvote Button -->
+                                <button type="button"
+                                        class="downvote-btn inline-flex items-center px-2 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                        data-id="{{ product.id }}">
+                                    <i class="fas fa-thumbs-down mr-1"></i>
+                                    <span class="downvote-count">{{ product.product_downvote_count }}</span>
+                                </button>
+
+                                <!-- Report Button -->
+                                <button type="button"
+                                        class="report-btn inline-flex items-center px-2 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                        data-id="{{ product.id }}">
+                                    <i class="fas fa-flag mr-1"></i>
+                                    Report
+                                </button>
+                            </div>
+
+                            <!-- Comment Form Row -->
+                            <div class="flex items-center space-x-2">
+                                <input type="text" name="comment_text" placeholder="Write a comment..."
+                                       class="comment-input flex-1 px-2 py-1 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                       data-id="{{ product.id }}">
+                                <button type="button"
+                                        class="comment-btn inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 whitespace-nowrap"
+                                        data-id="{{ product.id }}">
+                                    <i class="fas fa-comment mr-1"></i>
+                                    Comment
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 {% empty %}
@@ -235,4 +366,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'app/feed.js' %}"></script>
 {% endblock %}

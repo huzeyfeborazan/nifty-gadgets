@@ -42,6 +42,11 @@ def login_view(request):
 
 def logout_view(request):
     """This is the logout page view"""
+    # Clear all existing messages by marking them as used
+    storage = messages.get_messages(request)
+    for message in storage:
+        pass  # This marks all messages as used
+
     logout(request)
-    messages.info(request, 'You have been logged out.')
+    # Don't add a logout message since we're clearing all messages
     return redirect('app:home')

@@ -49,7 +49,7 @@ def product_detail_view(request, product_id):
         user_has_upvoted = user_has_downvoted = user_has_commented = user_has_reviewed = False
 
     # Fetch reviews along with their authors and timestamps
-    reviews = Review.objects.filter(product=product).select_related('user').order_by('-timestamp')
+    reviews = Review.objects.filter(product=product).select_related('user').order_by('-created_at')
 
     if request.method == 'POST' and user.is_authenticated:
         action = request.POST.get('action')

@@ -6,9 +6,23 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import User
 
 class RegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=False, help_text='Optional. Enter a valid email address.')
+
     class Meta:
         model = User
-        fields = ('username',)  # password fields are automatically included by UserCreationForm
+        fields = ('username', 'email')  # password fields are automatically included by UserCreationForm
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        email = self.cleaned_data.get('email')
+        if email:
+            user.user_email = email
+        else:
+            # Generate a unique email if none provided
+            user.user_email = f"user_{user.username}@niftygadgets.local"
+        if commit:
+            user.save()
+        return user
 
 class ProductForm(forms.ModelForm):
     """Form for adding a new product."""
